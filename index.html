@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ระบบจัดการสินค้า | เสี่ยกาน ธนาคารกรุงเทพ</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Login Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+      <div class="login-container">
+        <div class="login-header">
+          <div class="login-logo-container">
+            <svg
+              class="login-logo"
+              width="120"
+              height="120"
+              viewBox="0 0 120 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="60"
+                cy="60"
+                r="55"
+                fill="#f5f5f5"
+                stroke="#ff9800"
+                stroke-width="3"
+              />
+              <path d="M35 40h50v10H35z" fill="#ff9800" />
+              <path d="M35 55h50v10H35z" fill="#ff9800" />
+              <path d="M35 70h50v10H35z" fill="#ff9800" />
+              <path
+                d="M90 40L85 35H35l-5 5v40l5 5h50l5-5V40z"
+                fill="none"
+                stroke="#ff9800"
+                stroke-width="2"
+              />
+            </svg>
+          </div>
+          <h2>เสี่ยกาน แท่นปั้ม หมากยาง</h2>
+        </div>
+        <div class="login-body">
+          <p class="login-message">กรุณาใส่รหัส PIN เพื่อเข้าสู่ระบบ</p>
+          <div class="pin-display">
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+          </div>
+          <div class="pin-error" id="pinError"></div>
+          <div class="pin-keypad">
+            <button class="pin-key" data-key="1">1</button>
+            <button class="pin-key" data-key="2">2</button>
+            <button class="pin-key" data-key="3">3</button>
+            <button class="pin-key" data-key="4">4</button>
+            <button class="pin-key" data-key="5">5</button>
+            <button class="pin-key" data-key="6">6</button>
+            <button class="pin-key" data-key="7">7</button>
+            <button class="pin-key" data-key="8">8</button>
+            <button class="pin-key" data-key="9">9</button>
+            <button class="pin-key pin-key-clear" data-key="clear">ลบ</button>
+            <button class="pin-key" data-key="0">0</button>
+            <button class="pin-key pin-key-enter" data-key="enter">ตกลง</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-container" style="display: none">
+      <!-- Header Section -->
+      <header class="app-header">
+        <div class="header-left">
+          <img
+            src="https://www.truemoney.com/wp-content/uploads/2022/01/truemoney-wallet-logo.png"
+            alt="สงกรานต์ ธนาคารกรุงเทพ"
+            class="logo"
+          />
+          <span class="logo-text">เสี่ยกาน แท่นปั้ม หมากยาง</span>
+        </div>
+        <div class="header-right">
+          <div class="notification-badge" id="notificationBadge">
+            <i class="fas fa-bell"></i>
+            <span class="badge">3</span>
+          </div>
+          <i class="fas fa-gear"></i>
+        </div>
+      </header>
+
+      <!-- Balance Section -->
+      <section class="balance-section">
+        <div class="balance-container">
+          <p class="balance-label">ยอดขายรวม</p>
+          <h2 class="balance-amount">฿125,000.00</h2>
+          <div class="action-buttons">
+            <button class="add-money-btn">เพิ่มการขาย</button>
+            <button class="history-btn"><i class="fas fa-history"></i></button>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-value">32</span>
+            <span class="stat-label">รายการวันนี้</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">+12.5%</span>
+            <span class="stat-label">เทียบเดือนก่อน</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">85</span>
+            <span class="stat-label">สินค้าทั้งหมด</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="quick-actions">
+        <div class="action-item" id="scanBtn">
+          <div class="action-icon"><i class="fas fa-barcode"></i></div>
+          <p>สแกนสินค้า</p>
+        </div>
+        <div class="action-item" id="calculateBtn">
+          <div class="action-icon"><i class="fas fa-calculator"></i></div>
+          <p>คำนวณราคา</p>
+        </div>
+        <div class="action-item" id="stockBtn">
+          <div class="action-icon"><i class="fas fa-boxes"></i></div>
+          <p>สต็อค</p>
+        </div>
+        <div class="action-item" id="salesBtn">
+          <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+          <p>ยอดขาย</p>
+        </div>
+      </section>
+
+      <!-- Services Section -->
+      <section class="services-section">
+        <div class="section-header">
+          <h3 class="section-title">จัดการสินค้า</h3>
+          <span class="view-all" id="viewAllProducts"
+            >ดูทั้งหมด <i class="fas fa-chevron-right"></i
+          ></span>
+        </div>
+        <div class="services-grid">
+          <div class="service-item" id="addProductBtn">
+            <div class="service-icon"><i class="fas fa-box"></i></div>
+            <p>เพิ่มสินค้า</p>
+          </div>
+          <div class="service-item" id="editProductBtn">
+            <div class="service-icon"><i class="fas fa-edit"></i></div>
+            <p>แก้ไขสินค้า</p>
+          </div>
+          <div class="service-item" id="searchProductBtn">
+            <div class="service-icon"><i class="fas fa-search"></i></div>
+            <p>ค้นหา</p>
+          </div>
+          <div class="service-item" id="categoriesBtn">
+            <div class="service-icon"><i class="fas fa-tags"></i></div>
+            <p>หมวดหมู่</p>
+          </div>
+          <div class="service-item" id="shippingBtn">
+            <div class="service-icon"><i class="fas fa-truck"></i></div>
+            <p>ขนส่ง</p>
+          </div>
+          <div class="service-item" id="reportsBtn">
+            <div class="service-icon"><i class="fas fa-file-invoice"></i></div>
+            <p>รายงาน</p>
+          </div>
+          <div class="service-item" id="promotionsBtn">
+            <div class="service-icon"><i class="fas fa-percent"></i></div>
+            <p>โปรโมชั่น</p>
+          </div>
+          <div class="service-item" id="settingsBtn">
+            <div class="service-icon"><i class="fas fa-cog"></i></div>
+            <p>ตั้งค่า</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent Products -->
+      <section class="transactions-section">
+        <div class="section-header">
+          <h3 class="section-title">สินค้าล่าสุด</h3>
+          <span class="view-all"
+            >ดูทั้งหมด <i class="fas fa-chevron-right"></i
+          ></span>
+        </div>
+        <div class="transactions-list" id="productList">
+          <div class="transaction-item" data-id="1">
+            <div class="transaction-icon">
+              <i class="fas fa-box"></i>
+            </div>
+            <div class="transaction-details">
+              <p class="transaction-title">เสื้อยืด Cotton 100%</p>
+              <p class="transaction-date">
+                คงเหลือ: <span class="stock-count">45</span> ชิ้น
+              </p>
+            </div>
+            <p class="transaction-amount deposit">฿350.00</p>
+          </div>
+          <div class="transaction-item" data-id="2">
+            <div class="transaction-icon">
+              <i class="fas fa-box"></i>
+            </div>
+            <div class="transaction-details">
+              <p class="transaction-title">กางเกงยีนส์ขายาว</p>
+              <p class="transaction-date">
+                คงเหลือ: <span class="stock-count">20</span> ชิ้น
+              </p>
+            </div>
+            <p class="transaction-amount deposit">฿890.00</p>
+          </div>
+          <div class="transaction-item" data-id="3">
+            <div class="transaction-icon">
+              <i class="fas fa-box"></i>
+            </div>
+            <div class="transaction-details">
+              <p class="transaction-title">รองเท้าผ้าใบ</p>
+              <p class="transaction-date">
+                คงเหลือ: <span class="stock-count low-stock">15</span> คู่
+              </p>
+            </div>
+            <p class="transaction-amount deposit">฿1,200.00</p>
+          </div>
+          <div class="transaction-item" data-id="4">
+            <div class="transaction-icon">
+              <i class="fas fa-box"></i>
+            </div>
+            <div class="transaction-details">
+              <p class="transaction-title">กระเป๋าสะพาย</p>
+              <p class="transaction-date">
+                คงเหลือ: <span class="stock-count low-stock">8</span> ใบ
+              </p>
+            </div>
+            <p class="transaction-amount deposit">฿750.00</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Navigation -->
+      <nav class="bottom-nav">
+        <div class="nav-item active" id="homeNav">
+          <i class="fas fa-home"></i>
+          <p>หน้าหลัก</p>
+        </div>
+        <div class="nav-item" id="productsNav">
+          <i class="fas fa-boxes-stacked"></i>
+          <p>สินค้า</p>
+        </div>
+        <div class="nav-item" id="scanNav">
+          <i class="fas fa-barcode"></i>
+          <p>สแกน</p>
+        </div>
+        <div class="nav-item" id="reportsNav">
+          <i class="fas fa-chart-simple"></i>
+          <p>รายงาน</p>
+        </div>
+        <div class="nav-item" id="accountNav">
+          <i class="fas fa-user"></i>
+          <p>บัญชี</p>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="productModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>รายละเอียดสินค้า</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="product-image">
+            <i class="fas fa-box product-placeholder"></i>
+          </div>
+          <div class="product-info">
+            <h4 id="modalProductName">ชื่อสินค้า</h4>
+            <p>รหัสสินค้า: <span id="modalProductId">000</span></p>
+            <p>ราคา: <span id="modalProductPrice">฿0.00</span></p>
+            <p>คงเหลือ: <span id="modalProductStock">0</span> ชิ้น</p>
+            <p>หมวดหมู่: <span id="modalProductCategory">ทั่วไป</span></p>
+          </div>
+          <div class="product-actions">
+            <button class="btn-edit"><i class="fas fa-edit"></i> แก้ไข</button>
+            <button class="btn-delete"><i class="fas fa-trash"></i> ลบ</button>
+            <button class="btn-addstock">
+              <i class="fas fa-plus"></i> เพิ่มสต็อค
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal" id="addProductModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>เพิ่มสินค้าใหม่</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="addProductForm">
+            <div class="form-group">
+              <label for="productName">ชื่อสินค้า</label>
+              <input type="text" id="productName" required />
+            </div>
+            <div class="form-group">
+              <label for="productPrice">ราคา (บาท)</label>
+              <input
+                type="number"
+                id="productPrice"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="productStock">จำนวนสต็อค</label>
+              <input type="number" id="productStock" min="0" required />
+            </div>
+            <div class="form-group">
+              <label for="productCategory">หมวดหมู่</label>
+              <select id="productCategory">
+                <option value="เสื้อผ้า">เสื้อผ้า</option>
+                <option value="รองเท้า">รองเท้า</option>
+                <option value="กระเป๋า">กระเป๋า</option>
+                <option value="อุปกรณ์อิเล็กทรอนิกส์">
+                  อุปกรณ์อิเล็กทรอนิกส์
+                </option>
+                <option value="อื่นๆ">อื่นๆ</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-submit">บันทึก</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal" id="searchModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>ค้นหาสินค้า</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="search-container">
+            <div class="form-group">
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="ค้นหาตามชื่อสินค้า หรือรหัส"
+              />
+              <button class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="search-filters">
+              <label> <input type="checkbox" checked /> สินค้าทั้งหมด </label>
+              <label>
+                <input type="checkbox" checked /> แสดงเฉพาะสินค้าในสต็อค
+              </label>
+            </div>
+          </div>
+          <div class="search-results" id="searchResults">
+            <!-- Search results will appear here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories Modal -->
+    <div class="modal" id="categoriesModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>หมวดหมู่สินค้า</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="category-list">
+            <div class="category-item">
+              <span class="category-name">เสื้อผ้า</span>
+              <span class="category-count">12 รายการ</span>
+            </div>
+            <div class="category-item">
+              <span class="category-name">รองเท้า</span>
+              <span class="category-count">8 รายการ</span>
+            </div>
+            <div class="category-item">
+              <span class="category-name">กระเป๋า</span>
+              <span class="category-count">5 รายการ</span>
+            </div>
+            <div class="category-item">
+              <span class="category-name">อุปกรณ์อิเล็กทรอนิกส์</span>
+              <span class="category-count">10 รายการ</span>
+            </div>
+            <div class="category-item">
+              <span class="category-name">อื่นๆ</span>
+              <span class="category-count">3 รายการ</span>
+            </div>
+          </div>
+          <div class="category-actions">
+            <button class="btn-add-category">
+              <i class="fas fa-plus"></i> เพิ่มหมวดหมู่
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shipping Modal -->
+    <div class="modal" id="shippingModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>จัดการขนส่ง</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="shipping-options">
+            <div class="shipping-item">
+              <div class="shipping-icon"><i class="fas fa-truck"></i></div>
+              <div class="shipping-details">
+                <h4>Kerry Express</h4>
+                <p>ค่าส่ง: ฿50.00 - ฿80.00</p>
+              </div>
+              <div class="shipping-action">
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <div class="shipping-item">
+              <div class="shipping-icon"><i class="fas fa-truck"></i></div>
+              <div class="shipping-details">
+                <h4>Flash Express</h4>
+                <p>ค่าส่ง: ฿45.00 - ฿75.00</p>
+              </div>
+              <div class="shipping-action">
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <div class="shipping-item">
+              <div class="shipping-icon"><i class="fas fa-truck"></i></div>
+              <div class="shipping-details">
+                <h4>Thailand Post</h4>
+                <p>ค่าส่ง: ฿35.00 - ฿70.00</p>
+              </div>
+              <div class="shipping-action">
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <button class="btn-submit mt-10">บันทึกการตั้งค่า</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Modal -->
+    <div class="modal" id="reportsModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>รายงาน</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="reports-list">
+            <div class="report-item" data-report="sales">
+              <div class="report-icon"><i class="fas fa-chart-line"></i></div>
+              <div class="report-details">
+                <h4>รายงานยอดขาย</h4>
+                <p>ดูรายงานยอดขายตามช่วงเวลา</p>
+              </div>
+              <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="report-item" data-report="inventory">
+              <div class="report-icon"><i class="fas fa-boxes"></i></div>
+              <div class="report-details">
+                <h4>รายงานสินค้าคงเหลือ</h4>
+                <p>ตรวจสอบสินค้าและสต็อค</p>
+              </div>
+              <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="report-item" data-report="popular">
+              <div class="report-icon"><i class="fas fa-star"></i></div>
+              <div class="report-details">
+                <h4>สินค้าขายดี</h4>
+                <p>รายการสินค้าที่ขายดีที่สุด</p>
+              </div>
+              <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="report-item" data-report="revenue">
+              <div class="report-icon">
+                <i class="fas fa-money-bill-wave"></i>
+              </div>
+              <div class="report-details">
+                <h4>รายงานรายได้</h4>
+                <p>รายได้และกำไรจากการขาย</p>
+              </div>
+              <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promotions Modal -->
+    <div class="modal" id="promotionsModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>โปรโมชั่น</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="promotion-list">
+            <div class="promotion-item active">
+              <div class="promotion-status">
+                <span class="status active">กำลังใช้งาน</span>
+              </div>
+              <h4>ซื้อ 1 แถม 1</h4>
+              <p>สำหรับเสื้อยืด Cotton 100%</p>
+              <p class="promotion-dates">01/02/2023 - 28/02/2023</p>
+            </div>
+            <div class="promotion-item">
+              <div class="promotion-status">
+                <span class="status">ไม่ได้ใช้งาน</span>
+              </div>
+              <h4>ลด 20% ทุกรายการ</h4>
+              <p>สำหรับสมาชิกใหม่</p>
+              <p class="promotion-dates">เริ่มต้น: 01/03/2023</p>
+            </div>
+          </div>
+          <button class="btn-add-promotion">
+            <i class="fas fa-plus"></i> เพิ่มโปรโมชั่นใหม่
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>ตั้งค่า</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="settings-list">
+            <div class="settings-section">
+              <h4 class="settings-title">การแสดงผล</h4>
+              <div class="setting-item">
+                <span>ธีมสีมืด</span>
+                <label class="switch">
+                  <input type="checkbox" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <span>แสดงสินค้าที่ขายดีบนหน้าแรก</span>
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <div class="settings-section">
+              <h4 class="settings-title">แจ้งเตือน</h4>
+              <div class="setting-item">
+                <span>แจ้งเตือนเมื่อสินค้าใกล้หมด</span>
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <span>แจ้งเตือนยอดขายประจำวัน</span>
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <div class="settings-section">
+              <h4 class="settings-title">ความปลอดภัย</h4>
+              <div class="setting-item">
+                <span>ยืนยันด้วยรหัส PIN ก่อนลบข้อมูล</span>
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="setting-item" id="changePinBtn">
+                <span>เปลี่ยนรหัส PIN</span>
+                <button class="btn-small">แก้ไข</button>
+              </div>
+            </div>
+          </div>
+          <button class="btn-submit mt-10">บันทึกการตั้งค่า</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change PIN Modal -->
+    <div class="modal" id="changePinModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>เปลี่ยนรหัส PIN</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="pin-change-container">
+            <div class="form-group">
+              <label for="currentPin">รหัส PIN ปัจจุบัน</label>
+              <input
+                type="password"
+                id="currentPin"
+                maxlength="6"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="******"
+              />
+            </div>
+            <div class="form-group">
+              <label for="newPin">รหัส PIN ใหม่ (6 หลัก)</label>
+              <input
+                type="password"
+                id="newPin"
+                maxlength="6"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="******"
+              />
+            </div>
+            <div class="form-group">
+              <label for="confirmPin">ยืนยันรหัส PIN ใหม่</label>
+              <input
+                type="password"
+                id="confirmPin"
+                maxlength="6"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="******"
+              />
+            </div>
+            <div class="pin-change-error" id="pinChangeError"></div>
+            <button class="btn-submit" id="savePinBtn">บันทึกรหัส PIN</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- First Time PIN Setup Modal -->
+    <div class="modal" id="setupPinModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>ตั้งค่ารหัส PIN</h3>
+        </div>
+        <div class="modal-body">
+          <div class="pin-setup-container">
+            <p>กรุณาตั้งรหัส PIN 6 หลักสำหรับล็อคอินเข้าใช้งานระบบ</p>
+            <div class="form-group">
+              <label for="setupPin">รหัส PIN (6 หลัก)</label>
+              <input
+                type="password"
+                id="setupPin"
+                maxlength="6"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="******"
+              />
+            </div>
+            <div class="form-group">
+              <label for="confirmSetupPin">ยืนยันรหัส PIN</label>
+              <input
+                type="password"
+                id="confirmSetupPin"
+                maxlength="6"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="******"
+              />
+            </div>
+            <div class="pin-setup-error" id="pinSetupError"></div>
+            <button class="btn-submit" id="saveSetupPinBtn">
+              บันทึกรหัส PIN
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Modal -->
+    <div class="modal" id="accountModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>บัญชีผู้ใช้</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="account-profile">
+            <div class="profile-image">
+              <i class="fas fa-user-circle"></i>
+            </div>
+            <h4>คุณ ผู้ดูแลร้าน</h4>
+            <p class="user-email">admin@mystore.com</p>
+          </div>
+          <div class="account-menu">
+            <div class="account-menu-item">
+              <i class="fas fa-user-edit"></i>
+              <span>แก้ไขข้อมูลส่วนตัว</span>
+            </div>
+            <div class="account-menu-item">
+              <i class="fas fa-store"></i>
+              <span>ข้อมูลร้านค้า</span>
+            </div>
+            <div class="account-menu-item">
+              <i class="fas fa-shield-alt"></i>
+              <span>ความปลอดภัย</span>
+            </div>
+            <div class="account-menu-item">
+              <i class="fas fa-question-circle"></i>
+              <span>ช่วยเหลือ</span>
+            </div>
+            <div class="account-menu-item logout" id="logoutBtn">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>ออกจากระบบ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Products Modal -->
+    <div class="modal fullscreen" id="allProductsModal">
+      <div class="modal-content">
+        <div class="modal-header sticky">
+          <h3>รายการสินค้าทั้งหมด</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="filter-bar">
+            <div class="filter-item">
+              <select id="categoryFilter">
+                <option value="">ทุกหมวดหมู่</option>
+                <option value="เสื้อผ้า">เสื้อผ้า</option>
+                <option value="รองเท้า">รองเท้า</option>
+                <option value="กระเป๋า">กระเป๋า</option>
+                <option value="อุปกรณ์อิเล็กทรอนิกส์">
+                  อุปกรณ์อิเล็กทรอนิกส์
+                </option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <select id="sortFilter">
+                <option value="newest">ล่าสุด</option>
+                <option value="price-asc">ราคา: ต่ำ-สูง</option>
+                <option value="price-desc">ราคา: สูง-ต่ำ</option>
+                <option value="stock-asc">สต็อค: น้อย-มาก</option>
+              </select>
+            </div>
+          </div>
+          <div class="product-grid" id="allProductsList">
+            <!-- Product items will be added here by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal (for delete confirmations) -->
+    <div class="confirm-action" id="confirmActionModal">
+      <div class="confirm-box">
+        <h4 class="confirm-title" id="confirmTitle">ยืนยันการลบ</h4>
+        <p class="confirm-message" id="confirmMessage">
+          คุณต้องการดำเนินการนี้ใช่หรือไม่?
+        </p>
+        <div class="confirm-buttons">
+          <button class="btn-cancel" id="cancelActionBtn">ยกเลิก</button>
+          <button class="btn-confirm" id="confirmActionBtn">ยืนยัน</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div class="modal" id="notificationsModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>การแจ้งเตือน</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="notification-list">
+            <div class="notification-item new">
+              <i class="fas fa-bell"></i>
+              <div class="notification-details">
+                <h4>ออเดอร์ใหม่</h4>
+                <p>มีการสั่งซื้อสินค้า 2 รายการ</p>
+              </div>
+            </div>
+            <div class="notification-item">
+              <i class="fas fa-info-circle"></i>
+              <div class="notification-details">
+                <h4>แจ้งเตือนระบบ</h4>
+                <p>ระบบอัพเดทเวอร์ชันล่าสุดแล้ว</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
